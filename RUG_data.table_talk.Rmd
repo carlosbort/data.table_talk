@@ -29,25 +29,24 @@ library(data.table)
 
 (2) Basics data.table. 
 
-    - The **i,j,by** syntax. + Exercice
+    - The **i,j,by** syntax. + Exercises
   
 (3) Intermediate data.table. 
 
-    - .SD, multiple assign, setkey, setnames, %between%, .GRP, .BY, + Exercice.
+    - .SD, multiple assign, setkey, setnames, %between%, .GRP, .BY, + Exercises.
   
 (4) Advanced data.table and further steps 
 
-    - Shift, set, .EACHI, margarittr,  merge, pattern: like, + Exercice. 
+    - Shift, set, .EACHI, margarittr,  merge, pattern: like, + Exercises. 
     - Others. fread(), melt(), dcast(), IDateTime(), fwrite() 
     
 
 ## Objective
 
-- Data.table novice: Understand the package logic and its posibilities.
+- Data.table novice: Understand the package logic and its possibilities.
 
-- Data.table pr0s: Some useful tips.
+- Data.table pr0s: Get some useful tips.
 
-Code: https://www.dropbox.com/s/wdf45ujyktk30f9/datatable_talk_code.R?dl=0
 
 
 
@@ -134,7 +133,7 @@ diamonds<-as.data.frame(diamonds)
 
 - The examples will be done with `diamonds` dataset.
 
-- Exercices with flights dataset
+- Exercises with flights dataset
 
 ```{r}
 data("flights",package = "nycflights13" )
@@ -266,25 +265,15 @@ You can combine different data.table instruction by chaining theme with the squa
 diamonds[, .(mean_carat=mean(carat),sd_carat=sd(carat)), by=.(cut,color)][order(-cut)][1:10]
 ```
 
-### setcolorder()
 
-Change columns order by reference.
-
-```{r}
-colnames(diamonds)
-# Reverse the column names by reference
-setcolorder(diamonds,rev(colnames(diamonds)))
-colnames(diamonds)
-```
-
-### Let's do some exercices!
+### Let's do some exercises!
 
 <img src="https://media1.popsugar-assets.com/files/thumbor/j1x_psQOVzJLtCyFbYigvK0GwOY/fit-in/1024x1024/filters:format_auto-!!-:strip_icc-!!-/2014/03/24/844/n/1922283/9aa699fdc0e093f1_selffive/i/Especially-self-five.gif">
 
 
 
 
-# Data.table/Basic_Exercice
+# Data.table/Basic_Exercise
 
 
 ```{r}
@@ -311,7 +300,7 @@ Flight columns:
 
 - **time_hour** Scheduled date and hour of the flight as a POSIXct date. Along with origin, can be used to join flights data to weather data.
 
-## Exercice
+## Exercise
 
 1.- Transform `flights` into a data.table (setDT())
 
@@ -321,13 +310,13 @@ setDT(flights)
 class(flights)
 ```
 
-2.- How many where destinated to Miami?
+2.- How many flights went to Miami? (i=(condition subset), j= count)
 
 ```{r,echo=FALSE}
 flights[dest=="MIA",.N]
 ```
 
-3.- Calculate the total days of `air_time` (has NA's). (pssst: lubridate:::seconds_to_period() )
+3.- Calculate the total days of `air_time` (has NA's). (pssst: lubridate:::seconds_to_period()) (j= sum, airtime)
 
 ```{r,echo=F,warning=F,message=F}
 flights[,sum(air_time,na.rm=T)/(60*24)]
@@ -335,26 +324,26 @@ flights[,sum(air_time,na.rm=T)/(60*24)]
 lubridate:::seconds_to_period(flights[,sum(air_time,na.rm=T)]*60)
 ```
 
-4.- Mean difference by origin airport.
+4.- Calculate the mean of `dep_delay` by al the diferent origin airports.
 
 ```{r,echo=F,warning=F,message=F}
 flights[,mean(dep_delay,na.rm=T),by=origin]
 ```
 
-5.- Create a new data.table `delays_month` with mean, sd, and number of flights per month. (Same column names!) 
+5.- Create a new data.table `delays_month`. This data.table must contains the mean of departure delays, sd of departure delays, and the number of flights, aggregated by month. (Same column names!) 
 
 ```{r,echo=F}
 delays_month<-flights[,.(mean_delay=mean(dep_delay,na.rm=T),sd_delay=sd(dep_delay,na.rm=T),n_flights=.N) ,by=month]
 delays_month
 ```
 
-6.- Create a new binary column named `not_delayed` when dep_delay <0 , equals 1. (psssst: ifelse()). 
+6.- Create a new binary column named `not_delayed` when dep_delay <0 , equals 1. (psssst: ifelse() or subset and rewrite). 
 
 ```{r,echo=F}
 flights[,not_delayed:=ifelse(dep_delay<0,1,0)]
 ```
 
-7.- Calculate the mean of not delayed flights by company. Use the `not_delayed` column and name it as `perc_not_delayed`! Use the chaining to order by `perc_not_delayed`. (Add .N column)
+7.- Calculate the mean of not delayed flights by company and its number. Compute the mean of the previous created column `not_delayed` and name the new as `perc_not_delayed`! Use the chaining to order by `perc_not_delayed`. (Add .N column)
 
 ```{r,echo=F}
 flights[,.(perc_not_delayed=mean(not_delayed,na.rm=T),.N),by=carrier][order(-perc_not_delayed)]
@@ -444,11 +433,23 @@ setkey(diamonds,carat)
 setkeyv( diamonds, c( "carat", "cut" ) )
 ```
 
-### setnames
+### setnames()
 
 ```{r}
 setnames( diamonds, c("avg_price","avg_carat" ),c("mean_price","mean_carat" ) )
 ```
+
+### setcolorder()
+
+Change columns order by reference.
+
+```{r}
+colnames(diamonds)
+# Reverse the column names by reference
+setcolorder(diamonds,rev(colnames(diamonds)))
+colnames(diamonds)
+```
+
 
 ### %between%
 
@@ -505,7 +506,7 @@ par(mfrow=c(1,1))
 diamonds[,.GRP,by=clarity]
 ```
 
-# Data.table/Intermediate_Exercice
+# Data.table/Intermediate_Exercise
 
 0.- Rename `not_delayed` column to `i_hate_delays`
 
@@ -628,7 +629,7 @@ diamonds %>% setDT() %>%
 
 https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html
 
-# Data.table/Advanced_Exercice
+# Data.table/Advanced_Exercise
 
 
 1.- `magrittr` way! Calculate the mean of not delayed flights by company. Use the `not_delayed` column and name it as `perc_not_delayed`! Use the chaining to order by `perc_not_delayed`. (Add .N column)
@@ -692,13 +693,10 @@ flights[,(vars):=IDateTime(time_hour)]
 
 <img src="http://big.assets.huffingtonpost.com/10_Momn_12.gif">
 
-<br>
 
 Availables for further questions! 
 
 ## Jordi Puigdellívol: jpuigde@gmail.com, https://es.linkedin.com/in/jordi-puigdellivol-654b5265
-
-<br>
 
 ## Carlos Bort: carlosebort@gmail.com, https://www.linkedin.com/in/carlosbort
 
